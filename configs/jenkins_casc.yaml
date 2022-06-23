@@ -1,0 +1,163 @@
+jenkins:
+  systemMessage: "CIBR CICD Jenkins Deployment"               
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+       - id: ${JENKINS_ADMIN_ID}
+         password: ${JENKINS_ADMIN_PASSWORD}
+  authorizationStrategy: loggedInUsersCanDoAnything
+  remotingSecurity:
+    enabled: true
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              scope: GLOBAL
+              id: slack-token
+              secret: '${SLACK_TOKEN}'
+              description: Slack token
+          - string:
+              scope: GLOBAL
+              id: gp-username
+              secret: '${GP_USER}'
+              description: Greenplum Username
+          - string:
+              scope: GLOBAL
+              id: gp-password
+              secret: '${GP_PASSWORD}'
+              description: Greenplum Password
+          - string:
+              scope: GLOBAL
+              id: arango-username
+              secret: '${ARANGO_USER}'
+              description: ArangoDB Username
+          - string:
+              scope: GLOBAL
+              id: arango-password
+              secret: '${ARANGO_PASSWORD}'
+              description: ArangoDB Password
+          - string:
+              scope: GLOBAL
+              id: smtp-password
+              secret: '${SMTP_PASSWORD}'
+              description: SMTP Password
+          - string:
+              scope: GLOBAL
+              id: jwt-secret
+              secret: '${JWT_SECRET}'
+              description: JWT Secret
+          - string:
+              scope: GLOBAL
+              id: amplitude-key
+              secret: '${AMPLITUDE_PROD_API_KEY}'
+              description: Amplitude Key
+          - usernamePassword:
+              scope: GLOBAL
+              id: "github-credentials"
+              username: ${GITHUB_BOT_USERNAME}
+              password: ${GITHUB_BOT_PASSWORD}
+              description: "Username/Token Credentials for GitHub"
+unclassified:
+  location:
+    url: ${JENKINS_URL}
+    adminAddress: ${JENKINS_ADMIN_EMAIL_ADDRESS}
+  slackNotifier:
+    teamDomain: cibr-qcri
+    tokenCredentialId: slack-token
+jobs:
+  - script: >
+      freeStyleJob('toshi-build') {
+        description('Toshi - wallet explorer build job')
+        triggers {
+          githubPush()
+          githubPullRequest {
+              useGitHubHooks()
+              extensions {
+                  commitStatus {
+                      context('Jenkins')
+                      completedStatus('SUCCESS', 'Build succeeded!')
+                      completedStatus('FAILURE', 'Build failed. ')
+                      completedStatus('ERROR', 'Build errored. This is probably a problem with Jenkins or related infrastructure and not an issue with your code changes.')
+                  }
+              }
+          }
+        }
+        scm {
+          git {
+            remote { 
+              name('origin')
+              credentials('github-credentials')
+              refspec('+refs/heads/main:refs/remotes/origin/main +refs/pull/*:refs/remotes/origin/pr/*')
+              url('https://github.com/cibr-qcri/toshi.git')
+            }
+            branch('${sha1}')
+          }
+        }
+        wrappers {
+          credentialsBinding {
+            string('SLACK_TOKEN', 'slack-token')
+            string('GP_PASSWORD', 'gp-password')
+          }
+        }
+        steps {
+          shell('''#!/bin/bash
+             echo "Bulding Toshi...."
+             docker-compose -f docker-compose.dev.yml build
+             echo "hello -- $SLACK_TOKEN"
+             echo "ssss -- $GP_PASSWORD"
+          ''')
+        }
+        publishers {
+          slackNotifier {
+             notifySuccess(true)
+             notifyEveryFailure(true)
+             teamDomain("cibr-qcri")
+             room("#builds")
+             username("Jenkins")
+             tokenCredentialId("slack-token")
+             includeCustomMessage(false)
+             commitInfoChoice("NONE")
+         }
+        }
+      }
+
+  - script: >
+      freeStyleJob('dizzy-build') {
+        description('Dizzy - darkweb engine build job')
+        triggers {
+          githubPush()
+        }
+        scm {
+          git {
+            remote { 
+              url('https://github.com/cibr-qcri/dizzy.git')
+            }
+            branch 'main'
+          }
+        }
+      }
+
+  - script: >
+      freeStyleJob('kansa-build') {
+        description('Kansa - smart contract analysis build job')
+        triggers {
+          githubPush()
+        }
+        scm {
+          git {
+            remote { 
+              url('https://github.com/cibr-qcri/kansa.git')
+            }
+            branch 'main'
+          }
+        }
+      }
+tool:
+  git:
+    installations:
+      - name: Default
+        home: "/usr/bin/git"
+
+
