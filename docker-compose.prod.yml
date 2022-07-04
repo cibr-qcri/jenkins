@@ -1,0 +1,48 @@
+#   port mappings
+#
+#   service         local -> host
+#   ------------------------------
+#   proxy           8080  -> 8080
+
+version: '3.3'
+services:
+  proxy:
+    build:
+      context: ./proxy
+    depends_on:
+      - jenkins
+    links:
+      - jenkins
+    ports:
+      - '8880:8080'
+    restart: always
+    stdin_open: true
+    tty: true
+  jenkins:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        SLACK_TOKEN: ${SLACK_TOKEN:?Build argument needs to be set and non-empty}
+        GP_USER: ${GP_USER:?Build argument needs to be set and non-empty}
+        GP_PASSWORD: ${GP_PASSWORD}
+        ARANGO_USER: ${ARANGO_USER:?Build argument needs to be set and non-empty}
+        ARANGO_PASSWORD: ${ARANGO_PASSWORD}
+        SMTP_PASSWORD: ${SMTP_PASSWORD:?Build argument needs to be set and non-empty}
+        JWT_SECRET: ${JWT_SECRET:?Build argument needs to be set and non-empty}
+        AMPLITUDE_PROD_API_KEY: ${AMPLITUDE_PROD_API_KEY:?Build argument needs to be set and non-empty}
+        GITHUB_BOT_PASSWORD: ${GITHUB_BOT_PASSWORD:?Build argument needs to be set and non-empty}
+    environment:
+      JENKINS_ADMIN_ID: admin
+      JENKINS_ADMIN_PASSWORD: admin
+      JENKINS_URL: 'https://jenkins.cibr.qcri.org'
+      JENKINS_ADMIN_EMAIL_ADDRESS: 'admin@mail.cibr.qcri.org'
+      GITHUB_BOT_USERNAME: 'cibr-bot'
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./configs/jenkins_casc.yaml:/var/jenkins_home/casc.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    stdin_open: true
+    tty: true
