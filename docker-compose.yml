@@ -23,7 +23,7 @@ services:
     environment:
       JENKINS_ADMIN_ID: admin
       JENKINS_ADMIN_PASSWORD: admin
-      JENKINS_URL: 'http://localhost:8080'
+      JENKINS_URL: 'https://jenkins.cibr.qcri.org'
       JENKINS_ADMIN_EMAIL_ADDRESS: 'admin@mail.cibr.qcri.org'
       GITHUB_BOT_USERNAME: 'cibr-bot'
     ports:
