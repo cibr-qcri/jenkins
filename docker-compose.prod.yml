@@ -2,7 +2,7 @@
 #
 #   service         local -> host
 #   ------------------------------
-#   proxy           8080  -> 8080
+#   proxy           80  -> 8080
 
 version: '3.3'
 services:
@@ -38,8 +38,6 @@ services:
       JENKINS_URL: 'https://jenkins.cibr.qcri.org'
       JENKINS_ADMIN_EMAIL_ADDRESS: 'admin@mail.cibr.qcri.org'
       GITHUB_BOT_USERNAME: 'cibr-bot'
-    ports:
-      - '8080:8080'
     volumes:
       - ./configs/jenkins_casc.yaml:/var/jenkins_home/casc.yaml
       - /var/run/docker.sock:/var/run/docker.sock
