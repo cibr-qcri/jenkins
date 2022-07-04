@@ -2,7 +2,7 @@
 #
 #   service         local -> host
 #   ------------------------------
-#   proxy           80  -> 8080
+#   proxy           8080  -> 8080
 
 version: '3.3'
 services:
@@ -14,7 +14,7 @@ services:
     links:
       - jenkins
     ports:
-      - '8080:80'
+      - '8080:8080'
     restart: always
     stdin_open: true
     tty: true
