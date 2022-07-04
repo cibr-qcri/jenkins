@@ -9,7 +9,7 @@ Install Docker engine in the host machine. Please refer this [documentatio](http
 ## Starting
 
 ```zsh
-SLACK_TOKEN="<REPLACE>" GP_USER="<REPLACE>" GP_PASSWORD="<REPLACE>" ARANGO_USER="<REPLACE>" ARANGO_PASSWORD="<REPLACE>" SMTP_PASSWORD="<REPLACE>" JWT_SECRET="<REPLACE>" AMPLITUDE_PROD_API_KEY="<REPLACE>" docker-compose -f docker-compose.yml up --build
+SLACK_TOKEN="<REPLACE>" GP_USER="<REPLACE>" GP_PASSWORD="<REPLACE>" ARANGO_USER="<REPLACE>" ARANGO_PASSWORD="<REPLACE>" SMTP_PASSWORD="<REPLACE>" JWT_SECRET="<REPLACE>" AMPLITUDE_PROD_API_KEY="<REPLACE>" docker-compose -f docker-compose.yml up --build --detach
 ```
 
 ## Stopping

@@ -26,11 +26,7 @@ RUN curl -L \
 USER 0
 
 # Configurations related to Jenkins instance
-ENV JENKINS_ADMIN_ID=admin \
-    JENKINS_ADMIN_PASSWORD=admin \
-    JENKINS_URL=http://localhost:8080/ \
-    JENKINS_ADMIN_EMAIL_ADDRESS=admin@cibr.qcri.org \
-    SLACK_TOKEN=$SLACK_TOKEN \
+ENV SLACK_TOKEN=$SLACK_TOKEN \
     GP_USER=$GP_USER \
     GP_PASSWORD=$GP_PASSWORD \
     ARANGO_USER=$ARANGO_USER \
