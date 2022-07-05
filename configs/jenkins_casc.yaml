@@ -103,8 +103,8 @@ jobs:
               }
             }
             printPostContent(true)
-            regexpFilterText("\$")
-            regexpFilterExpression("")
+            regexpFilterText('$action#$draft_pr')
+            regexpFilterExpression('(reopened|opened|synchronize|ready_for_review)#(false)')
           }
         }
         scm {
@@ -133,15 +133,15 @@ jobs:
           ''')
         }
         publishers {
-          slackNotifier {
-             notifySuccess(true)
-             notifyEveryFailure(true)
-             teamDomain("cibr-qcri")
-             room("#builds")
-             username("Jenkins")
-             tokenCredentialId("slack-token")
-             includeCustomMessage(false)
-             commitInfoChoice("NONE")
+          # slackNotifier {
+          #    notifySuccess(true)
+          #    notifyEveryFailure(true)
+          #    teamDomain("cibr-qcri")
+          #    room("#builds")
+          #    username("Jenkins")
+          #    tokenCredentialId("slack-token")
+          #    includeCustomMessage(false)
+          #    commitInfoChoice("NONE")
          }
         }
       }
