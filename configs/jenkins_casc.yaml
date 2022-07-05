@@ -102,6 +102,9 @@ jobs:
               regexpFilter("")
               }
             }
+            printPostContent(true)
+            regexpFilterText("\$")
+            regexpFilterExpression("")
           }
         }
         scm {
