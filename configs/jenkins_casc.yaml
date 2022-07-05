@@ -132,18 +132,7 @@ jobs:
              echo "isPush -- $IS_PUSH"
           ''')
         }
-        publishers {
-          # slackNotifier {
-          #    notifySuccess(true)
-          #    notifyEveryFailure(true)
-          #    teamDomain("cibr-qcri")
-          #    room("#builds")
-          #    username("Jenkins")
-          #    tokenCredentialId("slack-token")
-          #    includeCustomMessage(false)
-          #    commitInfoChoice("NONE")
-          #  }
-        }
+        
       }
 
   - script: >
