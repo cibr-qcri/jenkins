@@ -70,10 +70,6 @@ jobs:
   - script: >
       freeStyleJob('toshi-build') {
         description('Toshi - wallet explorer build job')
-        parameters {
-          booleanParam('IS_PR_MERGED', false)
-          booleanParam('IS_PUSH', false)
-        }
         triggers {
           githubPush()
           githubPullRequest {
