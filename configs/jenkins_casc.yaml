@@ -142,7 +142,7 @@ jobs:
           #    tokenCredentialId("slack-token")
           #    includeCustomMessage(false)
           #    commitInfoChoice("NONE")
-         }
+          #  }
         }
       }
 
