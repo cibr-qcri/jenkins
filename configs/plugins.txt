@@ -11,4 +11,5 @@ pipeline-npm:0.9.2
 slack:608.v19e3b_44b_b_9ff
 conditional-buildstep:1.4.2
 envinject:2.866.v5c0403e3d4df
-ghprb:1.40.0
+ghprb:1.42.2
+generic-webhook-trigger:1.84

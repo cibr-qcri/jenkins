@@ -70,6 +70,10 @@ jobs:
   - script: >
       freeStyleJob('toshi-build') {
         description('Toshi - wallet explorer build job')
+        parameters {
+          booleanParam('IS_PR_MERGED', false)
+          booleanParam('IS_PUSH', false)
+        }
         triggers {
           githubPush()
           githubPullRequest {
@@ -83,6 +87,22 @@ jobs:
                   }
               }
           }
+          genericTrigger {
+            genericVariables {
+              genericVariable {
+              key("IS_PR_MERGED")
+              value("\$.pull_request.merged")
+              expressionType("JSONPath")
+              regexpFilter("")
+              }
+              genericVariable {
+              key("IS_PUSH")
+              value("\$.repository.pushed_at")
+              expressionType("JSONPath")
+              regexpFilter("")
+              }
+            }
+          }
         }
         scm {
           git {
@@ -90,7 +110,7 @@ jobs:
               name('origin')
               credentials('github-credentials')
               refspec('+refs/heads/main:refs/remotes/origin/main +refs/pull/*:refs/remotes/origin/pr/*')
-              url('https://github.com/cibr-qcri/toshi.git')
+              url('https://github.com/cibr-qcri/jenkins.git')
             }
             branch('${sha1}')
           }
@@ -105,8 +125,8 @@ jobs:
           shell('''#!/bin/bash
              echo "Bulding Toshi...."
              docker-compose -f docker-compose.dev.yml build
-             echo "hello -- $SLACK_TOKEN"
-             echo "ssss -- $GP_PASSWORD"
+             echo "isMerged -- $IS_PR_MERGED"
+             echo "isPush -- $IS_PUSH"
           ''')
         }
         publishers {
