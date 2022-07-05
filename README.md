@@ -25,6 +25,7 @@ docker-compose -f docker-compose.yml down --rmi all
 ```
 
 <!-- publishers {
+
           slackNotifier {
              notifySuccess(true)
              notifyEveryFailure(true)
