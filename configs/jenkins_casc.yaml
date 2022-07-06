@@ -189,7 +189,7 @@ jobs:
         steps {
           shell('''#!/bin/bash
              echo "Bulding Dizzy...."
-             docker-compose -f docker-compose.dev.yml build
+             docker-compose -f docker-compose.dev.yaml build
           ''')
         }
         publishers {
@@ -261,7 +261,7 @@ jobs:
         steps {
           shell('''#!/bin/bash
              echo "Bulding Kansa...."
-             docker-compose -f docker-compose.dev.yml build
+             docker-compose -f docker-compose.dev.yaml build
           ''')
         }
         publishers {
@@ -327,7 +327,7 @@ jobs:
         steps {
           shell('''#!/bin/bash
              echo "Bulding Bloomfi...."
-             docker-compose -f docker-compose.dev.yml build
+             docker-compose -f docker-compose.dev.yaml build
           ''')
         }
         publishers {
