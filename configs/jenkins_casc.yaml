@@ -66,51 +66,52 @@ unclassified:
   slackNotifier:
     teamDomain: cibr-qcri
     tokenCredentialId: slack-token
+  githubpluginconfig:
+    configs:
+      - name: "GitHub Credentials"
+        apiUrl: "https://api.github.com"
+        credentialsId: "github-credentials"
+        manageHooks: true
 jobs:
   - script: >
       freeStyleJob('toshi-build') {
         description('Toshi - wallet explorer build job')
+        properties {
+          githubProjectUrl('https://github.com/cibr-qcri/toshi')
+        }
         triggers {
           githubPush()
           githubPullRequest {
               useGitHubHooks()
+              triggerPhrase('ok to test')
+              permitAll()
               extensions {
                   commitStatus {
-                      context('Jenkins')
+                      context('CIBR Jenkins Builder')
+                      triggeredStatus('Starting building ...')
+                      startedStatus('Building Toshi application ...')
                       completedStatus('SUCCESS', 'Build succeeded!')
                       completedStatus('FAILURE', 'Build failed. ')
+                      completedStatus('PENDING', 'Still in progress...')
                       completedStatus('ERROR', 'Build errored. This is probably a problem with Jenkins or related infrastructure and not an issue with your code changes.')
                   }
+                  buildStatus {
+                    completedStatus('SUCCESS', 'There were no errors, go have a cup of coffee...')
+                    completedStatus('FAILURE', 'There were errors, for info, please see...')
+                    completedStatus('ERROR', 'There was an error in the infrastructure, please contact...')
+                  }
               }
-          }
-          genericTrigger {
-            genericVariables {
-              genericVariable {
-              key("IS_PR_MERGED")
-              value("\$.pull_request.merged")
-              expressionType("JSONPath")
-              regexpFilter("")
-              }
-              genericVariable {
-              key("IS_PUSH")
-              value("\$.repository.pushed_at")
-              expressionType("JSONPath")
-              regexpFilter("")
-              }
-            }
-            printPostContent(true)
-            regexpFilterText('$action#$draft_pr')
-            regexpFilterExpression('(reopened|opened|synchronize|ready_for_review)#(false)')
           }
         }
         scm {
           git {
             remote { 
-              name('origin')
+              github('cibr-qcri/toshi')
+              refspec('+refs/pull/*:refs/remotes/origin/pr/*')
               credentials('github-credentials')
-              refspec('+refs/heads/main:refs/remotes/origin/main +refs/pull/*:refs/remotes/origin/pr/*')
-              url('https://github.com/cibr-qcri/jenkins.git')
+              url('https://github.com/cibr-qcri/toshi.git')
             }
+            branch('${sha1}')
           }
         }
         wrappers {
@@ -123,42 +124,228 @@ jobs:
           shell('''#!/bin/bash
              echo "Bulding Toshi...."
              docker-compose -f docker-compose.dev.yml build
-             echo "isMerged -- $IS_PR_MERGED"
-             echo "isPush -- $IS_PUSH"
           ''')
         }
-        
+        publishers {
+            slackNotifier {
+              notifySuccess(true)
+              notifyEveryFailure(true)
+              teamDomain("cibr-qcri")
+              room("#builds")
+              username("Jenkins")
+              tokenCredentialId("slack-token")
+              includeCustomMessage(false)
+              commitInfoChoice("NONE")
+            }
+            mergeGithubPullRequest {
+              disallowOwnCode(true)
+              failOnNonMerge(true)
+              deleteOnMerge(true)
+            }
+        }
       }
 
   - script: >
       freeStyleJob('dizzy-build') {
-        description('Dizzy - darkweb engine build job')
+        description('Dizzy - darkweb search engine build job')
+        properties {
+          githubProjectUrl('https://github.com/cibr-qcri/dizzy')
+        }
         triggers {
           githubPush()
+          githubPullRequest {
+              useGitHubHooks()
+              triggerPhrase('ok to test')
+              permitAll()
+              extensions {
+                  commitStatus {
+                      context('CIBR Jenkins Builder')
+                      triggeredStatus('Starting building ...')
+                      startedStatus('Building Dizzy application ...')
+                      completedStatus('SUCCESS', 'Build succeeded!')
+                      completedStatus('FAILURE', 'Build failed. ')
+                      completedStatus('PENDING', 'Still in progress...')
+                      completedStatus('ERROR', 'Build errored. This is probably a problem with Jenkins or related infrastructure and not an issue with your code changes.')
+                  }
+                  buildStatus {
+                    completedStatus('SUCCESS', 'There were no errors, go have a cup of coffee...')
+                    completedStatus('FAILURE', 'There were errors, for info, please see...')
+                    completedStatus('ERROR', 'There was an error in the infrastructure, please contact...')
+                  }
+              }
+          }
         }
         scm {
           git {
             remote { 
+              github('cibr-qcri/dizzy')
+              refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+              credentials('github-credentials')
               url('https://github.com/cibr-qcri/dizzy.git')
             }
-            branch 'main'
+            branch('${sha1}')
           }
+        }
+        steps {
+          shell('''#!/bin/bash
+             echo "Bulding Dizzy...."
+             docker-compose -f docker-compose.dev.yml build
+          ''')
+        }
+        publishers {
+            slackNotifier {
+              notifySuccess(true)
+              notifyEveryFailure(true)
+              teamDomain("cibr-qcri")
+              room("#builds")
+              username("Jenkins")
+              tokenCredentialId("slack-token")
+              includeCustomMessage(false)
+              commitInfoChoice("NONE")
+            }
+            mergeGithubPullRequest {
+              disallowOwnCode(true)
+              failOnNonMerge(true)
+              deleteOnMerge(true)
+            }
         }
       }
 
   - script: >
       freeStyleJob('kansa-build') {
         description('Kansa - smart contract analysis build job')
+        properties {
+          githubProjectUrl('https://github.com/cibr-qcri/kansa')
+        }
         triggers {
           githubPush()
+          githubPullRequest {
+              useGitHubHooks()
+              triggerPhrase('ok to test')
+              permitAll()
+              extensions {
+                  commitStatus {
+                      context('CIBR Jenkins Builder')
+                      triggeredStatus('Starting building ...')
+                      startedStatus('Building Kansa application ...')
+                      completedStatus('SUCCESS', 'Build succeeded!')
+                      completedStatus('FAILURE', 'Build failed. ')
+                      completedStatus('PENDING', 'Still in progress...')
+                      completedStatus('ERROR', 'Build errored. This is probably a problem with Jenkins or related infrastructure and not an issue with your code changes.')
+                  }
+                  buildStatus {
+                    completedStatus('SUCCESS', 'There were no errors, go have a cup of coffee...')
+                    completedStatus('FAILURE', 'There were errors, for info, please see...')
+                    completedStatus('ERROR', 'There was an error in the infrastructure, please contact...')
+                  }
+              }
+          }
         }
         scm {
           git {
             remote { 
+              github('cibr-qcri/kansa')
+              refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+              credentials('github-credentials')
               url('https://github.com/cibr-qcri/kansa.git')
             }
-            branch 'main'
+            branch('${sha1}')
           }
+        }
+        wrappers {
+          credentialsBinding {
+            string('SLACK_TOKEN', 'slack-token')
+            string('GP_PASSWORD', 'gp-password')
+          }
+        }
+        steps {
+          shell('''#!/bin/bash
+             echo "Bulding Kansa...."
+             docker-compose -f docker-compose.dev.yml build
+          ''')
+        }
+        publishers {
+            slackNotifier {
+              notifySuccess(true)
+              notifyEveryFailure(true)
+              teamDomain("cibr-qcri")
+              room("#builds")
+              username("Jenkins")
+              tokenCredentialId("slack-token")
+              includeCustomMessage(false)
+              commitInfoChoice("NONE")
+            }
+            mergeGithubPullRequest {
+              disallowOwnCode(true)
+              failOnNonMerge(true)
+              deleteOnMerge(true)
+            }
+        }
+      }
+
+  - script: >
+      freeStyleJob('bloomfi-build') {
+        description('Bloomfi - Invest Defi build job')
+        properties {
+          githubProjectUrl('https://github.com/cibr-qcri/bloomfi')
+        }
+        triggers {
+          githubPush()
+          githubPullRequest {
+              useGitHubHooks()
+              triggerPhrase('ok to test')
+              permitAll()
+              extensions {
+                  commitStatus {
+                      context('CIBR Jenkins Builder')
+                      triggeredStatus('Starting building ...')
+                      startedStatus('Building Bloomfi application ...')
+                      completedStatus('SUCCESS', 'Build succeeded!')
+                      completedStatus('FAILURE', 'Build failed. ')
+                      completedStatus('PENDING', 'Still in progress...')
+                      completedStatus('ERROR', 'Build errored. This is probably a problem with Jenkins or related infrastructure and not an issue with your code changes.')
+                  }
+                  buildStatus {
+                    completedStatus('SUCCESS', 'There were no errors, go have a cup of coffee...')
+                    completedStatus('FAILURE', 'There were errors, for info, please see...')
+                    completedStatus('ERROR', 'There was an error in the infrastructure, please contact...')
+                  }
+              }
+          }
+        }
+        scm {
+          git {
+            remote { 
+              github('cibr-qcri/bloomfi')
+              refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+              credentials('github-credentials')
+              url('https://github.com/cibr-qcri/bloomfi.git')
+            }
+            branch('${sha1}')
+          }
+        }
+        steps {
+          shell('''#!/bin/bash
+             echo "Bulding Bloomfi...."
+             docker-compose -f docker-compose.dev.yml build
+          ''')
+        }
+        publishers {
+            slackNotifier {
+              notifySuccess(true)
+              notifyEveryFailure(true)
+              teamDomain("cibr-qcri")
+              room("#builds")
+              username("Jenkins")
+              tokenCredentialId("slack-token")
+              includeCustomMessage(false)
+              commitInfoChoice("NONE")
+            }
+            mergeGithubPullRequest {
+              disallowOwnCode(true)
+              failOnNonMerge(true)
+              deleteOnMerge(true)
+            }
         }
       }
 tool:
