@@ -74,12 +74,22 @@ jobs:
           githubPush()
           githubPullRequest {
               useGitHubHooks()
+              triggerPhrase('OK to test')
+              permitAll()
               extensions {
                   commitStatus {
-                      context('Jenkins')
+                      context('CIBR Jenkins Builder')
+                      triggeredStatus('Starting deployment to staging site...')
+                      startedStatus('Deploying to staging site...')
                       completedStatus('SUCCESS', 'Build succeeded!')
                       completedStatus('FAILURE', 'Build failed. ')
+                      completedStatus('PENDING', 'Still in progress...')
                       completedStatus('ERROR', 'Build errored. This is probably a problem with Jenkins or related infrastructure and not an issue with your code changes.')
+                  }
+                  buildStatus {
+                    completedStatus('SUCCESS', 'There were no errors, go have a cup of coffee...')
+                    completedStatus('FAILURE', 'There were errors, for info, please see...')
+                    completedStatus('ERROR', 'There was an error in the infrastructure, please contact...')
                   }
               }
           }
@@ -106,11 +116,12 @@ jobs:
         scm {
           git {
             remote { 
-              name('origin')
+              github('cibr-qcri/jenkins')
+              refspec('+refs/pull/*:refs/remotes/origin/pr/*')
               credentials('github-credentials')
-              refspec('+refs/heads/main:refs/remotes/origin/main +refs/pull/*:refs/remotes/origin/pr/*')
               url('https://github.com/cibr-qcri/jenkins.git')
             }
+            branch('${sha1}')
           }
         }
         wrappers {
@@ -127,7 +138,13 @@ jobs:
              echo "isPush -- $IS_PUSH"
           ''')
         }
-        
+        publishers {
+            mergeGithubPullRequest {
+                disallowOwnCode()
+                failOnNonMerge()
+                deleteOnMerge()
+            }
+        }
       }
 
   - script: >
