@@ -23,16 +23,3 @@ docker-compose -f docker-compose.yml down
 # Remove all images for a clean start
 docker-compose -f docker-compose.yml down --rmi all
 ```
-
-<!-- publishers {
-          slackNotifier {
-             notifySuccess(true)
-             notifyEveryFailure(true)
-             teamDomain("cibr-qcri")
-             room("#builds")
-             username("Jenkins")
-             tokenCredentialId("slack-token")
-             includeCustomMessage(false)
-             commitInfoChoice("NONE")
-          }
-        } -->
