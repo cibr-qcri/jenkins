@@ -132,7 +132,7 @@ jobs:
         }
         wrappers {
           credentialsBinding {
-            string('PRODUCTION_USER_ID', 'production-user-passwordid')
+            string('PRODUCTION_USER_ID', 'production-user-id')
             string('PRODUCTION_USER_PASSWORD', 'production-user-password')
             string('PRODUCTION_IP', 'production-ip')
           }
