@@ -53,6 +53,21 @@ credentials:
               id: amplitude-key
               secret: '${AMPLITUDE_PROD_API_KEY}'
               description: Amplitude Key
+          - string:
+              scope: GLOBAL
+              id: production-user-id
+              secret: '${PRODUCTION_USER_ID}'
+              description: Production SSH User
+          - string:
+              scope: GLOBAL
+              id: production-user-password
+              secret: '${PRODUCTION_USER_PASSWORD}'
+              description: Production SSH User Password
+          - string:
+              scope: GLOBAL
+              id: production-ip
+              secret: '${PRODUCTION_IP}'
+              description: Production IP
           - usernamePassword:
               scope: GLOBAL
               id: github-credentials
@@ -73,6 +88,100 @@ unclassified:
         credentialsId: github-credentials
         manageHooks: true
 jobs:
+  - script: >
+      freeStyleJob('jenkins-build') {
+        description('Jenkins -deployment build job')
+        properties {
+          githubProjectUrl('https://github.com/cibr-qcri/jenkins')
+        }
+        triggers {
+          githubPush()
+          githubPullRequest {
+              useGitHubHooks()
+              triggerPhrase('ok to test')
+              permitAll()
+              extensions {
+                  commitStatus {
+                      context('CIBR Jenkins Builder')
+                      triggeredStatus('Starting building ...')
+                      startedStatus('Building Jenkins application ...')
+                      completedStatus('SUCCESS', 'Build succeeded!')
+                      completedStatus('FAILURE', 'Build failed. ')
+                      completedStatus('PENDING', 'Still in progress...')
+                      completedStatus('ERROR', 'Build errored. This is probably a problem with Jenkins or related infrastructure and not an issue with your code changes.')
+                  }
+                  buildStatus {
+                    completedStatus('SUCCESS', 'There were no errors, go have a cup of coffee...')
+                    completedStatus('FAILURE', 'There were errors, for info, please see...')
+                    completedStatus('ERROR', 'There was an error in the infrastructure, please contact...')
+                  }
+              }
+          }
+        }
+        scm {
+          git {
+            remote { 
+              github('cibr-qcri/jenkins')
+              name('origin')
+              refspec('+refs/heads/main:refs/remotes/origin/main +refs/pull/*:refs/remotes/origin/pr/*')
+              credentials('github-credentials')
+              url('https://github.com/cibr-qcri/jenkins.git')
+            }
+            branch('main')
+          }
+        }
+        wrappers {
+          credentialsBinding {
+            string('PRODUCTION_USER_ID', 'production-user-passwordid')
+            string('PRODUCTION_USER_PASSWORD', 'production-user-password')
+            string('PRODUCTION_IP', 'production-ip')
+          }
+        }
+        steps {
+          shell('''#!/bin/bash
+             echo "Bulding Jenkins...."
+             docker-compose -f docker-compose.dev.yml build
+             if [ "$GIT_BRANCH" == "origin/main" ]; then
+                echo "Starting deploying the changes into the production environment"
+                echo $PRODUCTION_USER_ID
+                echo $PRODUCTION_USER_PASSWORD
+                echo $PRODUCTION_IP
+
+                work() {
+                    ls
+                    pwd
+                    echo "Some other command"
+                }
+
+                sshpass -p${PRODUCTION_USER_PASSWORD} ssh 'QCRI\${PRODUCTION_USER_ID}'@${PRODUCTION_IP} << EOSSH
+                    checkfunctioncall(){
+                       cd "/home"
+                       mkdir "remotecalltest"
+                    }
+                    checkfunctioncall
+                    EOSSH
+             fi
+          ''')
+        }
+        publishers {
+            slackNotifier {
+              notifySuccess(true)
+              notifyEveryFailure(true)
+              teamDomain("cibr-qcri")
+              room("#builds")
+              username("Jenkins")
+              tokenCredentialId("slack-token")
+              includeCustomMessage(false)
+              commitInfoChoice("NONE")
+            }
+            mergeGithubPullRequest {
+              disallowOwnCode(true)
+              failOnNonMerge(true)
+              deleteOnMerge(true)
+            }
+        }
+      }
+
   - script: >
       freeStyleJob('toshi-build') {
         description('Toshi - wallet explorer build job')
@@ -119,12 +228,17 @@ jobs:
           credentialsBinding {
             string('SLACK_TOKEN', 'slack-token')
             string('GP_PASSWORD', 'gp-password')
+            string('GP_PASSWORD', 'gp-password')
           }
         }
         steps {
           shell('''#!/bin/bash
              echo "Bulding Toshi...."
              docker-compose -f docker-compose.dev.yml build
+             if [ "$GIT_BRANCH" == "origin/main" ]; then
+                echo "Starting deploying the changes into the production environment"
+
+             fi
           ''')
         }
         publishers {
