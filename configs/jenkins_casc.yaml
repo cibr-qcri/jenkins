@@ -55,7 +55,7 @@ credentials:
               description: Amplitude Key
           - usernamePassword:
               scope: GLOBAL
-              id: "github-credentials"
+              id: github-credentials
               username: ${GITHUB_BOT_USERNAME}
               password: ${GITHUB_BOT_PASSWORD}
               description: "Username/Token Credentials for GitHub"
@@ -70,7 +70,7 @@ unclassified:
     configs:
       - name: "GitHub Credentials"
         apiUrl: "https://api.github.com"
-        credentialsId: "github-credentials"
+        credentialsId: github-credentials
         manageHooks: true
 jobs:
   - script: >
@@ -107,7 +107,8 @@ jobs:
           git {
             remote { 
               github('cibr-qcri/toshi')
-              refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+              name('origin')
+              refspec('+refs/heads/main:refs/remotes/origin/main +refs/pull/*:refs/remotes/origin/pr/*')
               credentials('github-credentials')
               url('https://github.com/cibr-qcri/toshi.git')
             }
