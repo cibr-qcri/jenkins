@@ -15,3 +15,4 @@ envinject:2.866.v5c0403e3d4df
 ghprb:1.42.2
 generic-webhook-trigger:1.84
 plain-credentials:1.8
+embeddable-build-status:237.v37e2c03964c9

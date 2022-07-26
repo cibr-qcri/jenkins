@@ -32,9 +32,12 @@ services:
         JWT_SECRET: ${JWT_SECRET:?Build argument needs to be set and non-empty}
         AMPLITUDE_PROD_API_KEY: ${AMPLITUDE_PROD_API_KEY:?Build argument needs to be set and non-empty}
         GITHUB_BOT_PASSWORD: ${GITHUB_BOT_PASSWORD:?Build argument needs to be set and non-empty}
+        JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD:?Build argument needs to be set and non-empty}
+        PRODUCTION_USER_ID: ${PRODUCTION_USER_ID:?Build argument needs to be set and non-empty}
+        PRODUCTION_USER_PASSWORD: ${PRODUCTION_USER_PASSWORD:?Build argument needs to be set and non-empty}
+        PRODUCTION_IP: ${PRODUCTION_IP:?Build argument needs to be set and non-empty}
     environment:
-      JENKINS_ADMIN_ID: admin
-      JENKINS_ADMIN_PASSWORD: admin
+      JENKINS_ADMIN_ID: cibr-admin
       JENKINS_URL: 'https://jenkins.cibr.qcri.org'
       JENKINS_ADMIN_EMAIL_ADDRESS: 'admin@mail.cibr.qcri.org'
       GITHUB_BOT_USERNAME: 'cibr-bot'
