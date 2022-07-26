@@ -15,6 +15,9 @@ USER root
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false -Dhudson.model.ParametersAction.keepUndefinedParameters=true
 ENV CASC_JENKINS_CONFIG /var/jenkins_home/casc.yaml
 
+RUN apt-get update -y \
+    && apt-get install -y sshpass
+
 COPY --chown=jenkins:jenkins configs/plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
 COPY configs/jenkins_casc.yaml /var/jenkins_home/casc.yaml
