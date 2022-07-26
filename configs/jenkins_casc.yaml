@@ -147,7 +147,7 @@ jobs:
                 echo $PRODUCTION_USER_PASSWORD
                 echo $PRODUCTION_IP
 
-                sshpass -p${PRODUCTION_USER_PASSWORD} ssh 'QCRI\${PRODUCTION_USER_ID}'@${PRODUCTION_IP} <<EOSSH
+                sshpass -p\$PRODUCTION_USER_PASSWORD ssh 'QCRI\$PRODUCTION_USER_ID'@\$PRODUCTION_IP <<EOSSH
                     checkfunctioncall(){
                     cd "/home"
                     mkdir "remotecalltest"
