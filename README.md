@@ -23,3 +23,4 @@ docker-compose -f docker-compose.yml down
 # Remove all images for a clean start
 docker-compose -f docker-compose.yml down --rmi all
 ```
+
