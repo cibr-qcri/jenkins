@@ -112,7 +112,7 @@ jobs:
               credentials('github-credentials')
               url('https://github.com/cibr-qcri/toshi.git')
             }
-            branch('${sha1}')
+            branch('main')
           }
         }
         wrappers {
