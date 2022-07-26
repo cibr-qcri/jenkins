@@ -147,16 +147,10 @@ jobs:
                 echo $PRODUCTION_USER_PASSWORD
                 echo $PRODUCTION_IP
 
-                work() {
-                    ls
-                    pwd
-                    echo "Some other command"
-                }
-
-                sshpass -p${PRODUCTION_USER_PASSWORD} ssh 'QCRI\${PRODUCTION_USER_ID}'@${PRODUCTION_IP} << EOSSH
+                sshpass -p${PRODUCTION_USER_PASSWORD} ssh 'QCRI\${PRODUCTION_USER_ID}'@${PRODUCTION_IP} <<EOSSH
                     checkfunctioncall(){
-                       cd "/home"
-                       mkdir "remotecalltest"
+                    cd "/home"
+                    mkdir "remotecalltest"
                     }
                     checkfunctioncall
                     EOSSH
